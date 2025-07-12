@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import pino from "pino-http";
 import dotenv from "dotenv";
-import contactsRouter from "./routers/contacts.js";
+import contactsRouter from "./routers/contactsRouter.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { notFoundHandler } from "./middlewares/notFoundHandler.js";
 import { initMongoConnection } from "./db/initMongoConnection.js";
