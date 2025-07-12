@@ -1,24 +1,25 @@
 {
-  "name": "goit-node-js",
+  "name": "nodejs-hw-mongodb",
   "version": "1.0.0",
-  "description": "goit-node-js",
+  "description": "",
+  "main": "src/index.js",
   "type": "module",
-  "main": "index.js",
   "scripts": {
-    "get-all": "node src/scripts/getAllContacts",
-    "generate": "node src/scripts/generateContacts.js",
-    "add-one": "node src/scripts/addOneContact.js",
-    "count": "node src/scripts/countContacts.js",
-    "remove-last": "node src/scripts/removeLastContact.js",
-    "remove-all": "node src/scripts/removeAllContacts.js"
+    "dev": "nodemon src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.3.1",
+    "pino": "^8.17.0",
+    "pino-http": "^10.5.0"
+  },
   "devDependencies": {
-    "@eslint/js": "^9.2.0",
-    "@faker-js/faker": "^9.9.0",
-    "eslint": "^9.2.0",
-    "globals": "^15.1.0"
+    "eslint": "^8.56.0",
+    "nodemon": "^3.1.0"
   }
 }
