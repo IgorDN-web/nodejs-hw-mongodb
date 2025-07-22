@@ -39,11 +39,12 @@ export const createContact = async (req, res) => {
   }
 
   const newContact = await createContactService(req.body);
+  const { __v, ...contactWithoutVersion } = newContact.toObject(); // прибрати __v
 
   res.status(201).json({
     status: 201,
     message: "Successfully created a contact!",
-    data: newContact,
+    data: contactWithoutVersion,
   });
 };
 
@@ -57,10 +58,12 @@ export const updateContact = async (req, res) => {
     throw createError(404, "Contact not found");
   }
 
+  const { __v, ...contactWithoutVersion } = updatedContact.toObject(); // прибрати __v
+
   res.status(200).json({
     status: 200,
     message: "Successfully patched a contact!",
-    data: updatedContact,
+    data: contactWithoutVersion,
   });
 };
 

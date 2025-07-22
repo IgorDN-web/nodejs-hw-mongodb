@@ -12,12 +12,16 @@ dotenv.config();
 const app = express();
 
 app.use(cors());
-app.use(pino());
+app.use(pino()); // логування запитів
 app.use(express.json());
 
+// Роут для контактів
 app.use("/contacts", contactsRouter);
 
+// Обробка неіснуючих маршрутів
 app.use(notFoundHandler);
+
+// Глобальна обробка помилок
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
@@ -25,10 +29,10 @@ const PORT = process.env.PORT || 3000;
 initMongoConnection()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`✅ Server is running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error("Failed to connect to MongoDB", err);
+    console.error("❌ Failed to connect to MongoDB", err);
     process.exit(1);
   });
