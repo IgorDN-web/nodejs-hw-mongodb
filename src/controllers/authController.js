@@ -54,20 +54,21 @@ export const login = async (req, res, next) => {
       throw createHttpError(401, "Invalid email or password");
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
       throw createHttpError(401, "Invalid email or password");
     }
 
-    // Remove existing session if any
+    // Видаляємо стару сесію (якщо є)
     await Session.deleteMany({ userId: user._id });
 
     const payload = { _id: user._id, email: user.email };
+
     const accessToken = generateAccessToken(payload);
     const refreshToken = generateRefreshToken(payload);
 
-    const accessTokenValidUntil = new Date(Date.now() + 15 * 60 * 1000);
-    const refreshTokenValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const accessTokenValidUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 хв
+    const refreshTokenValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 днів
 
     await Session.create({
       userId: user._id,
@@ -79,7 +80,7 @@ export const login = async (req, res, next) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      maxAge: 30 * 24 * 60 * 60 * 1000,
       sameSite: "strict",
       secure: process.env.NODE_ENV === "production",
     });
@@ -90,6 +91,7 @@ export const login = async (req, res, next) => {
       data: { accessToken },
     });
   } catch (error) {
+    console.error("Login error:", error.message); // для дебагу
     next(error);
   }
 };
@@ -104,7 +106,7 @@ export const refresh = async (req, res, next) => {
     let payload;
     try {
       payload = verifyRefreshToken(refreshToken);
-    } catch {
+    } catch (err) {
       throw createHttpError(401, "Invalid refresh token");
     }
 
@@ -113,10 +115,8 @@ export const refresh = async (req, res, next) => {
       throw createHttpError(401, "Session not found");
     }
 
-    // Delete old session
     await Session.deleteOne({ refreshToken });
 
-    // Generate new tokens
     const newAccessToken = generateAccessToken({ _id: payload._id, email: payload.email });
     const newRefreshToken = generateRefreshToken({ _id: payload._id, email: payload.email });
 
@@ -151,13 +151,11 @@ export const refresh = async (req, res, next) => {
 export const logout = async (req, res, next) => {
   try {
     const { refreshToken } = req.cookies;
-    if (!refreshToken) {
-      return res.status(204).end();
+
+    if (refreshToken) {
+      await Session.deleteOne({ refreshToken });
+      res.clearCookie("refreshToken");
     }
-
-    await Session.deleteOne({ refreshToken });
-
-    res.clearCookie("refreshToken");
 
     res.status(204).end();
   } catch (error) {
