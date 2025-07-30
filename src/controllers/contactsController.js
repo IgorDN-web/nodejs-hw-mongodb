@@ -1,4 +1,3 @@
-import createError from "http-errors";
 import {
   getAllContactsService,
   getContactByIdService,
@@ -7,69 +6,68 @@ import {
   deleteContactService,
 } from "../services/contacts.js";
 
-export const getAllContacts = async (req, res) => {
-  const data = await getAllContactsService(req.query);
-
-  res.status(200).json({
-    status: 200,
-    message: "Successfully found contacts!",
-    data,
-  });
-};
-
-export const getContactById = async (req, res) => {
-  const { contactId } = req.params;
-  const contact = await getContactByIdService(contactId);
-
-  if (!contact) {
-    throw createError(404, "Contact not found");
+export const getAllContacts = async (req, res, next) => {
+  try {
+    const userId = req.user._id; // берем userId из аутентификации
+    const contactsData = await getAllContactsService({ userId, ...req.query });
+    res.status(200).json({
+      status: 200,
+      message: "Successfully found contacts!",
+      data: contactsData,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  res.status(200).json({
-    status: 200,
-    message: `Successfully found contact with id ${contactId}!`,
-    data: contact,
-  });
 };
 
-export const createContact = async (req, res) => {
-  const newContact = await createContactService(req.body);
-  const { __v, ...contactWithoutVersion } = newContact.toObject();
-
-  res.status(201).json({
-    status: 201,
-    message: "Successfully created a contact!",
-    data: contactWithoutVersion,
-  });
-};
-
-export const updateContact = async (req, res) => {
-  const { contactId } = req.params;
-  const data = req.body;
-
-  const updatedContact = await updateContactService(contactId, data);
-
-  if (!updatedContact) {
-    throw createError(404, "Contact not found");
+export const getContactById = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const contact = await getContactByIdService(userId, req.params.contactId);
+    res.status(200).json({
+      status: 200,
+      message: "Successfully found contact!",
+      data: contact,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const { __v, ...contactWithoutVersion } = updatedContact.toObject();
-
-  res.status(200).json({
-    status: 200,
-    message: "Successfully patched a contact!",
-    data: contactWithoutVersion,
-  });
 };
 
-export const deleteContact = async (req, res) => {
-  const { contactId } = req.params;
-
-  const deleted = await deleteContactService(contactId);
-
-  if (!deleted) {
-    throw createError(404, "Contact not found");
+export const createContact = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const newContact = await createContactService(userId, req.body);
+    res.status(201).json({
+      status: 201,
+      message: "Successfully created contact!",
+      data: newContact,
+    });
+  } catch (error) {
+    next(error);
   }
+};
 
-  res.status(204).send();
+export const updateContact = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const updatedContact = await updateContactService(userId, req.params.contactId, req.body);
+    res.status(200).json({
+      status: 200,
+      message: "Successfully updated contact!",
+      data: updatedContact,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteContact = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    await deleteContactService(userId, req.params.contactId);
+    res.status(204).send(); // No content
+  } catch (error) {
+    next(error);
+  }
 };
