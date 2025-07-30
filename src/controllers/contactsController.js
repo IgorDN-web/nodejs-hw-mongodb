@@ -8,11 +8,12 @@ import {
 } from "../services/contacts.js";
 
 export const getAllContacts = async (req, res) => {
-  const contacts = await getAllContactsService();
+  const data = await getAllContactsService(req.query);
+
   res.status(200).json({
     status: 200,
-    message: "Contacts fetched successfully",
-    data: contacts,
+    message: "Successfully found contacts!",
+    data,
   });
 };
 
@@ -32,14 +33,8 @@ export const getContactById = async (req, res) => {
 };
 
 export const createContact = async (req, res) => {
-  const { name, phoneNumber, contactType } = req.body;
-
-  if (!name || !phoneNumber || !contactType) {
-    throw createError(400, "Missing required fields");
-  }
-
   const newContact = await createContactService(req.body);
-  const { __v, ...contactWithoutVersion } = newContact.toObject(); // прибрати __v
+  const { __v, ...contactWithoutVersion } = newContact.toObject();
 
   res.status(201).json({
     status: 201,
@@ -58,7 +53,7 @@ export const updateContact = async (req, res) => {
     throw createError(404, "Contact not found");
   }
 
-  const { __v, ...contactWithoutVersion } = updatedContact.toObject(); // прибрати __v
+  const { __v, ...contactWithoutVersion } = updatedContact.toObject();
 
   res.status(200).json({
     status: 200,
