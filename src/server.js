@@ -19,8 +19,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Роуты
-app.use("/contacts", contactsRouter);
-app.use("/auth", authRouter);
+app.use("/api/contacts", contactsRouter);
+app.use("/api/auth", authRouter);
+
 
 // Обработка несуществующих маршрутов
 app.use((req, res, next) => {
