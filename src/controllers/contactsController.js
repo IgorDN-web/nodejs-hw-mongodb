@@ -8,8 +8,8 @@ import {
 
 export const getAllContacts = async (req, res, next) => {
   try {
-    const userId = req.user._id; // берем userId из аутентификации
-    const contactsData = await getAllContactsService({ userId, ...req.query });
+    const userId = req.user._id;
+    const contactsData = await getAllContactsService(req.query, userId);
     res.status(200).json({
       status: 200,
       message: "Successfully found contacts!",
@@ -23,7 +23,7 @@ export const getAllContacts = async (req, res, next) => {
 export const getContactById = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const contact = await getContactByIdService(userId, req.params.contactId);
+    const contact = await getContactByIdService(req.params.contactId, userId);
     res.status(200).json({
       status: 200,
       message: "Successfully found contact!",
@@ -37,7 +37,7 @@ export const getContactById = async (req, res, next) => {
 export const createContact = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const newContact = await createContactService(userId, req.body);
+    const newContact = await createContactService(req.body, userId);
     res.status(201).json({
       status: 201,
       message: "Successfully created contact!",
@@ -51,7 +51,7 @@ export const createContact = async (req, res, next) => {
 export const updateContact = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const updatedContact = await updateContactService(userId, req.params.contactId, req.body);
+    const updatedContact = await updateContactService(req.params.contactId, req.body, userId);
     res.status(200).json({
       status: 200,
       message: "Successfully updated contact!",
@@ -65,7 +65,7 @@ export const updateContact = async (req, res, next) => {
 export const deleteContact = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    await deleteContactService(userId, req.params.contactId);
+    await deleteContactService(req.params.contactId, userId);
     res.status(204).send(); // No content
   } catch (error) {
     next(error);

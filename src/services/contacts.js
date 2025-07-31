@@ -1,4 +1,3 @@
-// src/services/contacts.js
 import createError from "http-errors";
 import { Contact } from "../models/contactModel.js";
 
@@ -7,6 +6,7 @@ export const getAllContactsService = async (
   userId
 ) => {
   const filter = { userId };
+
   if (type) filter.contactType = type;
   if (isFavourite !== undefined) filter.isFavourite = isFavourite === "true";
 
