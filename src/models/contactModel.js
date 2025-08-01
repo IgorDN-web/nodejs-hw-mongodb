@@ -7,6 +7,7 @@ const contactSchema = new mongoose.Schema(
     email: { type: String },
     isFavourite: { type: Boolean, default: false },
     contactType: { type: String, required: true },
+    photo: { type: String },  // добавлено поле photo
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }

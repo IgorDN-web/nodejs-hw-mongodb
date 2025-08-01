@@ -1,6 +1,8 @@
 import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
 import { Session } from "../models/sessionModel.js";
+import { User } from "../models/userModel.js";
+import { verifyAccessToken } from "../utils/tokenUtils.js";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 
@@ -13,21 +15,28 @@ export const authenticate = async (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const payload = jwt.verify(token, ACCESS_TOKEN_SECRET);
+    const payload = verifyAccessToken(token);
 
-    // Проверяем, что accessToken активен и существует в базе сессий
+    // Проверяем, что accessToken существует в базе сессий
     const session = await Session.findOne({ accessToken: token });
     if (!session) {
       throw createHttpError(401, "Session not found. Please log in again.");
     }
 
-    req.user = payload;
+    // Получаем пользователя из базы
+    const user = await User.findById(payload._id);
+    if (!user) {
+      throw createHttpError(401, "User not found");
+    }
+
+    // Добавляем пользователя в req
+    req.user = user;
     next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       next(createHttpError(401, "Access token expired"));
     } else {
-      next(createHttpError(401, "Not authorized"));
+      next(createHttpError(401, error.message || "Not authorized"));
     }
   }
 };
