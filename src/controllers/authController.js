@@ -59,7 +59,7 @@ export const login = async (req, res, next) => {
       throw createHttpError(401, "Invalid email or password");
     }
 
-    // Видаляємо стару сесію (якщо є)
+    // Удаляем все старые сессии пользователя
     await Session.deleteMany({ userId: user._id });
 
     const payload = { _id: user._id, email: user.email };
@@ -67,8 +67,8 @@ export const login = async (req, res, next) => {
     const accessToken = generateAccessToken(payload);
     const refreshToken = generateRefreshToken(payload);
 
-    const accessTokenValidUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 хв
-    const refreshTokenValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 днів
+    const accessTokenValidUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 минут
+    const refreshTokenValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 дней
 
     await Session.create({
       userId: user._id,
@@ -91,7 +91,7 @@ export const login = async (req, res, next) => {
       data: { accessToken },
     });
   } catch (error) {
-    console.error("Login error:", error.message); // для дебагу
+    console.error("Login error:", error.message);
     next(error);
   }
 };
@@ -152,11 +152,22 @@ export const logout = async (req, res, next) => {
   try {
     const { refreshToken } = req.cookies;
 
-    if (refreshToken) {
-      await Session.deleteOne({ refreshToken });
-      res.clearCookie("refreshToken");
+    const authHeader = req.headers.authorization;
+    let accessToken;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      accessToken = authHeader.split(" ")[1];
     }
 
+    // Удаляем сессию по refreshToken и accessToken
+    const filter = { $or: [] };
+    if (refreshToken) filter.$or.push({ refreshToken });
+    if (accessToken) filter.$or.push({ accessToken });
+
+    if (filter.$or.length > 0) {
+      await Session.deleteOne(filter);
+    }
+
+    res.clearCookie("refreshToken");
     res.status(204).end();
   } catch (error) {
     next(error);

@@ -21,7 +21,6 @@ export const authenticate = async (req, res, next) => {
       throw createHttpError(401, "Session not found. Please log in again.");
     }
 
-    // Добавляем данные пользователя в объект запроса для дальнейшего использования
     req.user = payload;
     next();
   } catch (error) {
