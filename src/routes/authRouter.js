@@ -1,8 +1,14 @@
 import express from "express";
 import { ctrlWrapper } from "../utils/ctrlWrapper.js";
 import { validateBody } from "../middlewares/validateBody.js";
-import { registerSchema, loginSchema } from "../schemas/authSchemas.js";
-import { sendResetEmailSchema, resetPasswordSchema } from "../schemas/resetPasswordSchema.js";
+import {
+  registerSchema,
+  loginSchema,
+} from "../schemas/authSchemas.js";
+import {
+  sendResetEmailSchema,
+  resetPasswordSchema,
+} from "../schemas/resetPasswordSchema.js";
 import {
   register,
   login,

@@ -13,8 +13,98 @@ import {
 
 const SALT_ROUNDS = 10;
 
-// Регистрация, логин, refresh, logout - как у вас (пропущу тут чтобы не дублировать)
+// --- Регистрация ---
+export const register = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      throw createHttpError(409, "Email in use");
+    }
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    const newUser = await User.create({ email, password: hashedPassword });
+    res.status(201).json({
+      status: 201,
+      message: "User registered successfully",
+      data: { userId: newUser._id, email: newUser.email },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
+// --- Логин ---
+export const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw createHttpError(401, "Email or password is wrong");
+    }
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      throw createHttpError(401, "Email or password is wrong");
+    }
+    const accessToken = generateAccessToken({ _id: user._id, email: user.email });
+    const refreshToken = generateRefreshToken({ _id: user._id, email: user.email });
+
+    // Сохраняем сессию с refreshToken
+    await Session.create({ userId: user._id, refreshToken });
+
+    res.status(200).json({
+      status: 200,
+      message: "Login successful",
+      data: { accessToken, refreshToken },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// --- Refresh токен ---
+export const refresh = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      throw createHttpError(401, "Refresh token missing");
+    }
+    const payload = verifyRefreshToken(refreshToken);
+    const session = await Session.findOne({ userId: payload._id, refreshToken });
+    if (!session) {
+      throw createHttpError(401, "Invalid refresh token");
+    }
+    const accessToken = generateAccessToken({ _id: payload._id, email: payload.email });
+    const newRefreshToken = generateRefreshToken({ _id: payload._id, email: payload.email });
+
+    // Обновляем сессию новым refreshToken
+    session.refreshToken = newRefreshToken;
+    await session.save();
+
+    res.status(200).json({
+      status: 200,
+      message: "Token refreshed",
+      data: { accessToken, refreshToken: newRefreshToken },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// --- Logout ---
+export const logout = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      throw createHttpError(401, "Refresh token missing");
+    }
+    await Session.deleteOne({ refreshToken });
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+// --- Отправка письма для сброса пароля ---
 export const sendResetEmail = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -24,12 +114,10 @@ export const sendResetEmail = async (req, res, next) => {
       throw createHttpError(404, "User not found!");
     }
 
-    // Генерация токена на 5 минут
-    const token = generateResetPasswordToken({ email: user.email });
+    const token = generateResetPasswordToken({ email: user.email }); // 5 минут в utils
 
     const resetLink = `${process.env.APP_DOMAIN}/reset-password?token=${token}`;
 
-    // Настройка транспорта nodemailer
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT),
@@ -64,6 +152,7 @@ export const sendResetEmail = async (req, res, next) => {
   }
 };
 
+// --- Сброс пароля ---
 export const resetPassword = async (req, res, next) => {
   try {
     const { token, password } = req.body;
@@ -71,7 +160,7 @@ export const resetPassword = async (req, res, next) => {
     let payload;
     try {
       payload = verifyResetPasswordToken(token);
-    } catch (err) {
+    } catch {
       throw createHttpError(401, "Token is expired or invalid.");
     }
 
@@ -84,7 +173,6 @@ export const resetPassword = async (req, res, next) => {
     user.password = hashedPassword;
     await user.save();
 
-    // Удаляем все сессии пользователя
     await Session.deleteMany({ userId: user._id });
 
     res.status(200).json({
