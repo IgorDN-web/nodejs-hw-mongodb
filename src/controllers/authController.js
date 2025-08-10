@@ -114,7 +114,7 @@ export const sendResetEmail = async (req, res, next) => {
       throw createHttpError(404, "User not found!");
     }
 
-    const token = generateResetPasswordToken({ email: user.email }); // 5 минут в utils
+    const token = generateResetPasswordToken({ email: user.email });
 
     const resetLink = `${process.env.APP_DOMAIN}/reset-password?token=${token}`;
 
@@ -131,16 +131,14 @@ export const sendResetEmail = async (req, res, next) => {
     const mailOptions = {
       from: process.env.SMTP_FROM,
       to: user.email,
-      subject: "Reset your password",
+      subject: "Reset Your Password",
       html: `<p>Click the link below to reset your password. The link is valid for 5 minutes:</p>
              <a href="${resetLink}">${resetLink}</a>`,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-
-    if (!info.accepted.length) {
+    await transporter.sendMail(mailOptions).catch((error) => {
       throw createHttpError(500, "Failed to send the email, please try again later.");
-    }
+    });
 
     res.status(200).json({
       status: 200,
@@ -162,6 +160,10 @@ export const resetPassword = async (req, res, next) => {
       payload = verifyResetPasswordToken(token);
     } catch {
       throw createHttpError(401, "Token is expired or invalid.");
+    }
+
+    if (!payload.email) {
+      throw createHttpError(401, "Invalid token payload.");
     }
 
     const user = await User.findOne({ email: payload.email });

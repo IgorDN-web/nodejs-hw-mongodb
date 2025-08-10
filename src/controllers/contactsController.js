@@ -1,3 +1,4 @@
+import createHttpError from "http-errors";
 import {
   getAllContactsService,
   getContactByIdService,
@@ -39,7 +40,7 @@ export const createContact = async (req, res, next) => {
     const userId = req.user._id;
     const contactData = { ...req.body };
     if (req.file) {
-      contactData.photo = req.file.path;
+      contactData.photo = req.file.path; // URL от Cloudinary
     }
     const newContact = await createContactService(contactData, userId);
     res.status(201).json({
@@ -57,7 +58,7 @@ export const updateContact = async (req, res, next) => {
     const userId = req.user._id;
     const contactData = { ...req.body };
     if (req.file) {
-      contactData.photo = req.file.path;
+      contactData.photo = req.file.path; // URL от Cloudinary
     }
     const updatedContact = await updateContactService(req.params.contactId, contactData, userId);
     res.status(200).json({
