@@ -1,4 +1,3 @@
-// src/server.js
 import express from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
@@ -17,6 +16,14 @@ app.use(morgan("dev"));
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
+
+// Добавляем обработчик для корневого маршрута
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: 200,
+    message: "Welcome to the Contacts API",
+  });
+});
 
 // Роуты
 app.use("/contacts", contactsRouter);
