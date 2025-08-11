@@ -53,7 +53,19 @@ export const login = async (req, res, next) => {
     const accessToken = generateAccessToken({ _id: user._id, email: user.email });
     const refreshToken = generateRefreshToken({ _id: user._id, email: user.email });
 
-    await Session.create({ userId: user._id, refreshToken });
+    // Обчислюємо терміни дії токенів (припустимо, що функції повертають об’єкт із expiresIn)
+    const accessTokenExpiresIn = 15 * 60 * 1000; // 15 хвилин у мілісекундах
+    const refreshTokenExpiresIn = 7 * 24 * 60 * 60 * 1000; // 7 днів у мілісекундах
+    const accessTokenValidUntil = new Date(Date.now() + accessTokenExpiresIn);
+    const refreshTokenValidUntil = new Date(Date.now() + refreshTokenExpiresIn);
+
+    await Session.create({
+      userId: user._id,
+      refreshToken,
+      accessToken,
+      refreshTokenValidUntil,
+      accessTokenValidUntil,
+    });
 
     res.status(200).json({
       status: 200,
@@ -80,7 +92,16 @@ export const refresh = async (req, res, next) => {
     const accessToken = generateAccessToken({ _id: payload._id, email: payload.email });
     const newRefreshToken = generateRefreshToken({ _id: payload._id, email: payload.email });
 
+    // Оновлюємо терміни дії
+    const accessTokenExpiresIn = 15 * 60 * 1000; // 15 хвилин
+    const refreshTokenExpiresIn = 7 * 24 * 60 * 60 * 1000; // 7 днів
+    const accessTokenValidUntil = new Date(Date.now() + accessTokenExpiresIn);
+    const refreshTokenValidUntil = new Date(Date.now() + refreshTokenExpiresIn);
+
     session.refreshToken = newRefreshToken;
+    session.accessToken = accessToken;
+    session.accessTokenValidUntil = accessTokenValidUntil;
+    session.refreshTokenValidUntil = refreshTokenValidUntil;
     await session.save();
 
     res.status(200).json({
