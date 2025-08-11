@@ -2,7 +2,6 @@ import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
 import { User } from "../models/userModel.js";
 import { Session } from "../models/sessionModel.js";
-import nodemailer from "nodemailer";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -10,6 +9,7 @@ import {
   generateResetPasswordToken,
   verifyResetPasswordToken,
 } from "../utils/tokenUtils.js";
+import { sendResetEmail as sendEmail } from "../services/emailService.js";
 
 const SALT_ROUNDS = 10;
 
@@ -53,9 +53,9 @@ export const login = async (req, res, next) => {
     const accessToken = generateAccessToken({ _id: user._id, email: user.email });
     const refreshToken = generateRefreshToken({ _id: user._id, email: user.email });
 
-    // Обчислюємо терміни дії токенів (припустимо, що функції повертають об’єкт із expiresIn)
+    // Обчислюємо терміни дії токенів
     const accessTokenExpiresIn = 15 * 60 * 1000; // 15 хвилин у мілісекундах
-    const refreshTokenExpiresIn = 7 * 24 * 60 * 60 * 1000; // 7 днів у мілісекундах
+    const refreshTokenExpiresIn = 30 * 24 * 60 * 60 * 1000; // 30 днів у мілісекундах
     const accessTokenValidUntil = new Date(Date.now() + accessTokenExpiresIn);
     const refreshTokenValidUntil = new Date(Date.now() + refreshTokenExpiresIn);
 
@@ -94,7 +94,7 @@ export const refresh = async (req, res, next) => {
 
     // Оновлюємо терміни дії
     const accessTokenExpiresIn = 15 * 60 * 1000; // 15 хвилин
-    const refreshTokenExpiresIn = 7 * 24 * 60 * 60 * 1000; // 7 днів
+    const refreshTokenExpiresIn = 30 * 24 * 60 * 60 * 1000; // 30 днів
     const accessTokenValidUntil = new Date(Date.now() + accessTokenExpiresIn);
     const refreshTokenValidUntil = new Date(Date.now() + refreshTokenExpiresIn);
 
@@ -121,6 +121,11 @@ export const logout = async (req, res, next) => {
     if (!refreshToken) {
       throw createHttpError(401, "Refresh token missing");
     }
+    const payload = verifyRefreshToken(refreshToken);
+    const session = await Session.findOne({ userId: payload._id, refreshToken });
+    if (!session) {
+      throw createHttpError(401, "Invalid refresh token");
+    }
     await Session.deleteOne({ refreshToken });
     res.status(204).send();
   } catch (error) {
@@ -142,27 +147,7 @@ export const sendResetEmail = async (req, res, next) => {
 
     const resetLink = `${process.env.APP_DOMAIN}/reset-password?token=${token}`;
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.SMTP_FROM,
-      to: user.email,
-      subject: "Reset Your Password",
-      html: `<p>Click the link below to reset your password. The link is valid for 5 minutes:</p>
-             <a href="${resetLink}">${resetLink}</a>`,
-    };
-
-    await transporter.sendMail(mailOptions).catch((error) => {
-      throw createHttpError(500, "Failed to send the email, please try again later.");
-    });
+    await sendEmail(user.email, token);
 
     res.status(200).json({
       status: 200,

@@ -17,5 +17,13 @@ export async function sendResetEmail(email, token) {
     subject: 'Reset Password',
     html: `<p>Please reset your password: <a href="${resetUrl}">${resetUrl}</a></p>`,
   };
-  await transporter.sendMail(mailOptions);
+  try {
+    console.log('Attempting to send email to:', email); // Лог для отладки
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent:', info.response);
+    return info;
+  } catch (error) {
+    console.error('SMTP Error:', error.message); // Лог ошибки
+    throw new Error("Failed to send the email, please try again later.");
+  }
 }
