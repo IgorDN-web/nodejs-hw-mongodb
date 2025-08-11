@@ -16,13 +16,18 @@ const SALT_ROUNDS = 10;
 // --- Регистрация ---
 export const register = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      throw createHttpError(400, "Missing required fields: name, email, or password");
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       throw createHttpError(409, "Email in use");
     }
+
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-    const newUser = await User.create({ email, password: hashedPassword });
+    const newUser = await User.create({ name, email, password: hashedPassword });
     res.status(201).json({
       status: 201,
       message: "User registered successfully",
@@ -48,7 +53,6 @@ export const login = async (req, res, next) => {
     const accessToken = generateAccessToken({ _id: user._id, email: user.email });
     const refreshToken = generateRefreshToken({ _id: user._id, email: user.email });
 
-    // Сохраняем сессию с refreshToken
     await Session.create({ userId: user._id, refreshToken });
 
     res.status(200).json({
@@ -76,7 +80,6 @@ export const refresh = async (req, res, next) => {
     const accessToken = generateAccessToken({ _id: payload._id, email: payload.email });
     const newRefreshToken = generateRefreshToken({ _id: payload._id, email: payload.email });
 
-    // Обновляем сессию новым refreshToken
     session.refreshToken = newRefreshToken;
     await session.save();
 
