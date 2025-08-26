@@ -1,4 +1,5 @@
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
+import createHttpError from "http-errors";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -14,16 +15,14 @@ export async function sendResetEmail(email, token) {
   const mailOptions = {
     from: process.env.SMTP_FROM,
     to: email,
-    subject: 'Reset Password',
+    subject: "Reset Password",
     html: `<p>Please reset your password: <a href="${resetUrl}">${resetUrl}</a></p>`,
   };
   try {
-    console.log('Attempting to send email to:', email); // Лог для отладки
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent:', info.response);
+    console.log("Email sent:", info.response);
     return info;
   } catch (error) {
-    console.error('SMTP Error:', error.message); // Лог ошибки
-    throw new Error("Failed to send the email, please try again later.");
+    throw createHttpError(500, "Failed to send the email, please try again later.");
   }
 }

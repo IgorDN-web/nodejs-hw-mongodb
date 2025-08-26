@@ -6,6 +6,7 @@ import {
   updateContactService,
   deleteContactService,
 } from "../services/contacts.js";
+import { uploadToCloudinary } from "../services/cloudinaryService.js";
 
 export const getAllContacts = async (req, res, next) => {
   try {
@@ -39,9 +40,12 @@ export const createContact = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const contactData = { ...req.body };
+
     if (req.file) {
-      contactData.photo = req.file.path; // URL от Cloudinary
+      const photoUrl = await uploadToCloudinary(req.file.path);
+      contactData.photo = photoUrl;
     }
+
     const newContact = await createContactService(contactData, userId);
     res.status(201).json({
       status: 201,
@@ -57,9 +61,12 @@ export const updateContact = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const contactData = { ...req.body };
+
     if (req.file) {
-      contactData.photo = req.file.path; // URL от Cloudinary
+      const photoUrl = await uploadToCloudinary(req.file.path);
+      contactData.photo = photoUrl;
     }
+
     const updatedContact = await updateContactService(req.params.contactId, contactData, userId);
     res.status(200).json({
       status: 200,
