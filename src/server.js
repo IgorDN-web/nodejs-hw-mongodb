@@ -1,56 +1,56 @@
-import express from "express";
-import dotenv from "dotenv";
-import morgan from "morgan";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import createError from "http-errors";
-import { initMongoConnection } from "./db/initMongoConnection.js";
-import contactsRouter from "./routes/contactsRouter.js";
-import authRouter from "./routes/authRouter.js";
+// src/server.js
+import cookieParser from 'cookie-parser';
+import pino from 'pino-http';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express from 'express';
+import { getEnvVar } from './utils/getEnvVar.js';
+
+import router from './routers/index.js';
+import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+import { UPLOAD_DIR } from './constants/index.js';
+import { initMongoConnection } from './db/initMongoConnection.js';
 
 dotenv.config();
 
-const app = express();
+const PORT = Number(getEnvVar('PORT', '3000'));
 
-app.use(morgan("dev"));
-app.use(cors({ origin: true, credentials: true }));
-app.use(express.json());
-app.use(cookieParser());
+const startServer = async () => {
+  // 1️⃣ Подключаемся к MongoDB
+  await initMongoConnection();
 
-// Добавляем обработчик для корневого маршрута
-app.get("/", (req, res) => {
-  res.status(200).json({
-    status: 200,
-    message: "Welcome to the Contacts API",
+  // 2️⃣ Создаем и настраиваем Express
+  const app = express();
+
+  app.use(express.json());
+  app.use(cors());
+  app.use(cookieParser());
+
+  app.use(
+    pino({
+      transport: {
+        target: 'pino-pretty',
+      },
+    }),
+  );
+
+  // Основные роуты
+  app.use(router);
+
+  // Статика для загруженных файлов
+  app.use('/uploads', express.static(UPLOAD_DIR));
+
+  // Обработчики ошибок
+  app.use(notFoundHandler);
+  app.use(errorHandler);
+
+  // Запуск сервера
+  app.listen(PORT, () => {
+    console.log(`Server is running on ${PORT}`);
   });
+};
+
+startServer().catch(err => {
+  console.error('Error starting server:', err);
 });
-
-// Роуты
-app.use("/contacts", contactsRouter);
-app.use("/auth", authRouter);
-
-// Обработка несуществующих маршрутов
-app.use((req, res, next) => {
-  next(createError(404, "Route not found"));
-});
-
-// Глобальный обработчик ошибок
-app.use((err, req, res, next) => {
-  res.status(err.status || 500).json({
-    status: err.status,
-    message: err.message,
-  });
-});
-
-// Запуск сервера
-const PORT = process.env.PORT || 3000;
-initMongoConnection()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`🚀 Server is running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("Failed to connect to MongoDB", err);
-    process.exit(1);
-  });
