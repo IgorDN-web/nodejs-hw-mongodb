@@ -181,13 +181,18 @@ export const sendResetEmail = async (req, res, next) => {
     const user = await User.findOne({ email });
     if (!user) throw createHttpError(404, "User not found!");
 
+    const RESET_SECRET = process.env.PASSWORD_RESET_TOKEN_SECRET;
+    const APP_DOMAIN = process.env.APP_DOMAIN;
+
     if (!RESET_SECRET) throw createHttpError(500, "Server misconfigured (no reset secret)");
     if (!APP_DOMAIN) throw createHttpError(500, "Server misconfigured (no APP_DOMAIN)");
 
     const token = jwt.sign({ email: user.email }, RESET_SECRET, { expiresIn: "5m" });
 
     const link = `${APP_DOMAIN.replace(/\/$/, "")}/reset-password?token=${encodeURIComponent(token)}`;
+
     await sendMail({
+      from: process.env.SMTP_FROM, // 👈 добавил
       to: user.email,
       subject: "Reset your password",
       html: resetPasswordTemplate({ name: user.name, link }),
@@ -199,8 +204,9 @@ export const sendResetEmail = async (req, res, next) => {
       data: {},
     });
   } catch (error) {
+    console.error("sendResetEmail error:", error); // 👈 логирование SMTP ошибки
     if (error.status) return next(error);
-    next(error);
+    next(createHttpError(500, "Failed to send the email, please try again later."));
   }
 };
 
