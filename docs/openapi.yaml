@@ -1,0 +1,133 @@
+openapi: 3.0.3
+info:
+  title: Contacts API
+  description: API for managing contacts (CRUD, authentication, users).
+  version: 1.0.0
+  contact:
+    name: Igor Developer
+    email: igor@example.com
+    url: https://github.com/IgorDN-web
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local server
+
+tags:
+  - name: Contacts
+    description: Operations related to contacts
+  - name: Auth
+    description: User authentication and registration
+
+paths:
+  /contacts:
+    get:
+      tags: [Contacts]
+      summary: Get all contacts
+      description: Returns a list of all contacts available for the authenticated user.
+      responses:
+        '200':
+          description: Successfully retrieved contacts
+          content:
+            application/json:
+              schema:
+                $ref: ./components/schemas.yaml#/schemas/ContactsList
+        '401':
+          $ref: ./components/responses.yaml#/responses/Unauthorized
+
+    post:
+      tags: [Contacts]
+      summary: Create a new contact
+      description: Creates and stores a new contact in the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./components/schemas.yaml#/schemas/Contact
+      responses:
+        '201':
+          description: Successfully created a contact
+          content:
+            application/json:
+              schema:
+                $ref: ./components/schemas.yaml#/schemas/Contact
+        '401':
+          $ref: ./components/responses.yaml#/responses/Unauthorized
+
+  /contacts/{id}:
+    get:
+      tags: [Contacts]
+      summary: Get contact by ID
+      description: Returns a single contact by its unique identifier.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully found contact
+          content:
+            application/json:
+              schema:
+                $ref: ./components/schemas.yaml#/schemas/Contact
+        '401':
+          $ref: ./components/responses.yaml#/responses/Unauthorized
+        '404':
+          description: Contact not found
+
+    patch:
+      tags: [Contacts]
+      summary: Update a contact
+      description: Updates fields of an existing contact.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./components/schemas.yaml#/schemas/Contact
+      responses:
+        '200':
+          description: Successfully updated contact
+          content:
+            application/json:
+              schema:
+                $ref: ./components/schemas.yaml#/schemas/Contact
+        '401':
+          $ref: ./components/responses.yaml#/responses/Unauthorized
+        '404':
+          description: Contact not found
+
+    delete:
+      tags: [Contacts]
+      summary: Delete a contact
+      description: Deletes a contact from the database by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted contact
+        '401':
+          $ref: ./components/responses.yaml#/responses/Unauthorized
+        '404':
+          description: Contact not found
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []

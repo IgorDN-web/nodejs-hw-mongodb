@@ -1,0 +1,9 @@
+apis:
+  contacts@v1:
+    root: docs/openapi.yaml
+extends:
+  - recommended
+rules:
+  no-unused-components: error
+# theme больше не указываем здесь
+# htmlTemplate нужно подключать через index.html, как вы уже сделали

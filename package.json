@@ -1,1 +1,35 @@
-{"name":"nodejs-hw-mongodb","version":"1.1.0","description":"HW6: email reset + images","main":"src/index.js","type":"module","scripts":{"dev":"nodemon src/server.js","start":"node src/server.js"},"keywords":[],"author":"","license":"ISC","dependencies":{"bcrypt":"^6.0.0","cloudinary":"^1.41.3","cookie-parser":"^1.4.7","cors":"^2.8.5","dotenv":"^16.4.5","express":"^4.19.2","http-errors":"^2.0.0","joi":"^17.13.3","jsonwebtoken":"^9.0.2","mongoose":"^8.6.0","morgan":"^1.10.0","multer":"^1.4.5-lts.1","nodemailer":"^6.10.1","pino":"^8.17.0","pino-http":"^10.5.0","streamifier":"^0.1.1"},"devDependencies":{"eslint":"^8.56.0","nodemon":"^3.1.10"}}
+{
+  "name": "nodejs-hw-mongodb",
+  "version": "1.1.0",
+  "description": "HW6: email reset + images + Swagger",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "build-docs": "redocly bundle docs/openapi.yaml --ext json -o docs/swagger.json",
+    "preview-docs": "redocly preview"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^1.41.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "http-errors": "^2.0.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.6.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.10.1",
+    "pino": "^8.17.0",
+    "pino-http": "^10.5.0",
+    "streamifier": "^0.1.1"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^2.0.8",
+    "eslint": "^8.56.0",
+    "nodemon": "^3.1.10"
+  }
+}

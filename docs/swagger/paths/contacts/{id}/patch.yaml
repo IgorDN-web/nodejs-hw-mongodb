@@ -1,0 +1,38 @@
+patch:
+  summary: Update contact by ID
+  tags:
+    - Contacts
+  parameters:
+    - in: path
+      name: id
+      schema:
+        type: string
+      required: true
+      description: Contact ID
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../../components/schemas.yaml#/schemas/Contact
+  responses:
+    '200':
+      description: Successfully updated contact!
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [status, message, data]
+            properties:
+              status:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: Successfully updated contact!
+              data:
+                $ref: ../../../components/schemas.yaml#/schemas/Contact
+    '401':
+      $ref: ../../../components/responses.yaml#/responses/Unauthorized
+    '404':
+      description: Contact not found

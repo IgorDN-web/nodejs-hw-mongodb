@@ -1,0 +1,30 @@
+delete:
+  summary: Delete contact by ID
+  tags:
+    - Contacts
+  parameters:
+    - in: path
+      name: id
+      schema:
+        type: string
+      required: true
+      description: Contact ID
+  responses:
+    '200':
+      description: Successfully deleted contact.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [status, message]
+            properties:
+              status:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: Successfully deleted contact.
+    '401':
+      $ref: ../../../components/responses.yaml#/responses/Unauthorized
+    '404':
+      description: Contact not found

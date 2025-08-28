@@ -1,0 +1,29 @@
+post:
+  summary: Create a new contact
+  tags:
+    - Contacts
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas.yaml#/schemas/Contact
+  responses:
+    '201':
+      description: Successfully created contact!
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [status, message, data]
+            properties:
+              status:
+                type: integer
+                example: 201
+              message:
+                type: string
+                example: Successfully created contact!
+              data:
+                $ref: ../../components/schemas.yaml#/schemas/Contact
+    '401':
+      $ref: ../../components/responses.yaml#/responses/Unauthorized

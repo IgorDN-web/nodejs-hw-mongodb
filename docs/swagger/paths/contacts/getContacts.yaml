@@ -1,0 +1,28 @@
+tags:
+  - Contacts
+summary: Get all contacts
+operationId: getContacts
+description: Retrieve list of contacts
+security:
+  - bearerAuth: []
+responses:
+  '200':
+    description: List of contacts
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message, data]
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully retrieved contacts!
+            data:
+              type: array
+              items:
+                $ref: ../../components/schemas.yaml#/schemas/Contact
+  '401':
+    $ref: ../../components/responses.yaml#/responses/Unauthorized
