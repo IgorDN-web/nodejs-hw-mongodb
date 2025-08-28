@@ -2,24 +2,29 @@
 import nodemailer from "nodemailer";
 import createHttpError from "http-errors";
 
-if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASSWORD || !process.env.SMTP_FROM) {
+if (
+  !process.env.SMTP_HOST ||
+  !process.env.SMTP_USER ||
+  !process.env.SMTP_PASSWORD ||
+  !process.env.SMTP_FROM
+) {
   throw new Error("SMTP configuration is missing in .env");
 }
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: false, // true для 465, false для 587
+  port: Number(process.env.SMTP_PORT) || 465,
+  secure: true, // ukr.net использует 465 SSL
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
   },
 });
 
-// Проверка подключения
+// Проверка соединения при запуске
 transporter.verify()
-  .then(() => console.log("SMTP connection successful"))
-  .catch(err => console.error("SMTP connection error:", err));
+  .then(() => console.log("✅ SMTP connection successful"))
+  .catch(err => console.error("❌ SMTP connection error:", err));
 
 export async function sendMail({ from, to, subject, html }) {
   try {
@@ -29,10 +34,10 @@ export async function sendMail({ from, to, subject, html }) {
       subject,
       html,
     });
-    console.log("Email sent:", info.messageId);
+    console.log("📩 Email sent:", info.messageId);
     return info;
   } catch (e) {
-    console.error("sendMail error:", e);
+    console.error("❌ sendMail error:", e);
     throw createHttpError(500, "Failed to send the email, please try again later.");
   }
 }
