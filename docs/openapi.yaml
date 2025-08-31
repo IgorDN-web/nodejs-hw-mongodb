@@ -1,78 +1,227 @@
-openapi: 3.1.0
-info:
-  version: 1.0.0
-  title: Contacts API (hw7-swagger)
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  description: |
-    REST API для роботи з контактами (CRUD) + авторизація. Документація зібрана ReDocly, інтерактив — на /api-docs.
-
-tags:
-  - name: Contacts
-    description: Операції з контактами
-  - name: Auth
-    description: Авторизація та токени
-
-servers:
-  - url: http://localhost:3000
-    description: Local
-  - url: https://nodejs-hw-mongodb-7-5jsk.onrender.com
-    description: Render (hw7-swagger)
-
-paths:
-  /contacts:
-    get:
-      $ref: ../swagger/paths/contacts/get.yaml
-    post:
-      $ref: ../swagger/paths/contacts/post.yaml
-
-  /contacts/{contactId}:
-    parameters:
-      - $ref: ../swagger/components/parameters/contactId.yaml
-    get:
-      $ref: ../swagger/paths/contacts/{contactId}/get.yaml
-    patch:
-      $ref: ../swagger/paths/contacts/{contactId}/patch.yaml
-    delete:
-      $ref: ../swagger/paths/contacts/{contactId}/delete.yaml
-
-  /auth/register:
-    post:
-      $ref: ../swagger/paths/auth/register.post.yaml
-  /auth/login:
-    post:
-      $ref: ../swagger/paths/auth/login.post.yaml
-  /auth/refresh:
-    post:
-      $ref: ../swagger/paths/auth/refresh.post.yaml
-  /auth/logout:
-    post:
-      $ref: ../swagger/paths/auth/logout.post.yaml
-
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
-  schemas:
-    $ref: ../swagger/components/schemas.yaml
-
-  responses:
-    $ref: ../swagger/components/responses.yaml
-
-  parameters:
-    contactId:
-      $ref: ../swagger/components/parameters/contactId.yaml
-    paginationPage:
-      $ref: ../swagger/components/parameters/paginationPage.yaml
-    paginationLimit:
-      $ref: ../swagger/components/parameters/paginationLimit.yaml
-    sortBy:
-      $ref: ../swagger/components/parameters/sortBy.yaml
-    sortOrder:
-      $ref: ../swagger/components/parameters/sortOrder.yaml
-    favorite:
-      $ref: ../swagger/components/parameters/favorite.yaml
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Contacts API",
+    "version": "1.0.0",
+    "description": "API for managing contacts (CRUD, authentication, users).",
+    "contact": {
+      "name": "Igor Developer",
+      "url": "https://example.com",
+      "email": "igor@example.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/contacts": {
+      "get": {
+        "summary": "Get all contacts",
+        "operationId": "getContacts",
+        "responses": {
+          "200": {
+            "description": "List of contacts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactsList"
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      },
+      "post": {
+        "summary": "Create a new contact",
+        "operationId": "createContact",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Contact created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Contact" }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/contacts/{contactId}": {
+      "get": {
+        "summary": "Get contact by ID",
+        "operationId": "getContactById",
+        "parameters": [
+          {
+            "name": "contactId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contact found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Contact" }
+              }
+            }
+          },
+          "404": { "description": "Contact not found" },
+          "401": { "description": "Unauthorized" }
+        }
+      },
+      "patch": {
+        "summary": "Update a contact",
+        "operationId": "updateContact",
+        "parameters": [
+          {
+            "name": "contactId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contact updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Contact" }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "404": { "description": "Contact not found" },
+          "401": { "description": "Unauthorized" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a contact",
+        "operationId": "deleteContact",
+        "parameters": [
+          {
+            "name": "contactId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Contact deleted successfully" },
+          "404": { "description": "Contact not found" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "summary": "Register new user",
+        "operationId": "registerUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User registered successfully" },
+          "400": { "description": "Invalid input" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "User login",
+        "operationId": "loginUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Contact": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "phone": { "type": "string" },
+          "image": { "type": "string", "format": "binary" }
+        }
+      },
+      "ContactInput": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "phone": { "type": "string" },
+          "image": { "type": "string", "format": "binary" }
+        }
+      },
+      "ContactsList": {
+        "type": "array",
+        "items": { "$ref": "#/components/schemas/Contact" }
+      },
+      "UserInput": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": ["email", "password"]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

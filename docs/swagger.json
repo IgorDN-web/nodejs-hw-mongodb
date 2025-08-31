@@ -39,13 +39,14 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": { "$ref": "#/components/schemas/ContactInput" }
             }
           }
         },
         "responses": {
           "201": { "description": "Successfully created contact", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Contact" } } } },
+          "400": { "description": "Invalid input" },
           "401": { "$ref": "#/components/responses/Unauthorized" }
         }
       }
@@ -74,13 +75,14 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": { "$ref": "#/components/schemas/ContactInput" }
             }
           }
         },
         "responses": {
           "200": { "description": "Successfully updated contact", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Contact" } } } },
+          "400": { "description": "Invalid input" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "404": { "description": "Contact not found" }
         }
@@ -93,7 +95,7 @@
           { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
-          "200": { "description": "Successfully deleted contact" },
+          "204": { "description": "Successfully deleted contact" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "404": { "description": "Contact not found" }
         }
@@ -107,14 +109,12 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UserInput" }
-            }
+            "application/json": { "schema": { "$ref": "#/components/schemas/UserInput" } }
           }
         },
         "responses": {
           "201": { "description": "User registered successfully" },
-          "400": { "description": "Bad request" }
+          "400": { "description": "Invalid input" }
         }
       }
     },
@@ -126,9 +126,7 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UserInput" }
-            }
+            "application/json": { "schema": { "$ref": "#/components/schemas/UserInput" } }
           }
         },
         "responses": {
@@ -139,9 +137,6 @@
     }
   },
   "components": {
-    "securitySchemes": {
-      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
-    },
     "schemas": {
       "Contact": {
         "type": "object",
@@ -149,7 +144,8 @@
           "_id": { "type": "string", "example": "64d1f8a2c2f1b23a4f9c1234" },
           "name": { "type": "string", "example": "John Doe" },
           "email": { "type": "string", "format": "email", "example": "john@example.com" },
-          "phone": { "type": "string", "example": "+380501234567" }
+          "phone": { "type": "string", "example": "+380501234567" },
+          "image": { "type": "string", "format": "binary" }
         }
       },
       "ContactInput": {
@@ -157,7 +153,8 @@
         "properties": {
           "name": { "type": "string", "example": "John Doe" },
           "email": { "type": "string", "format": "email", "example": "john@example.com" },
-          "phone": { "type": "string", "example": "+380501234567" }
+          "phone": { "type": "string", "example": "+380501234567" },
+          "image": { "type": "string", "format": "binary" }
         },
         "required": ["name", "email"]
       },
@@ -173,6 +170,9 @@
         },
         "required": ["email", "password"]
       }
+    },
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
     },
     "responses": {
       "Unauthorized": {
