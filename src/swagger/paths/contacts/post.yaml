@@ -1,15 +1,46 @@
 tags: [Contacts]
 summary: Створити контакт
 operationId: createContact
-description: Створює новий контакт
+description: Створює новий контакт з можливістю завантаження фото (photo).
 security:
   - bearerAuth: []
 requestBody:
   required: true
   content:
-    application/json:
+    multipart/form-data:
       schema:
-        $ref: ../../components/schemas.yaml#/ContactCreate
+        type: object
+        required:
+          - name
+          - email
+          - phoneNumber
+          - contactType
+        properties:
+          name:
+            type: string
+            example: 'John Doe'
+            description: "Ім'я контакту"
+          email:
+            type: string
+            format: email
+            example: 'john@example.com'
+            description: 'Email контакту'
+          phoneNumber:
+            type: string
+            example: '+380501234567'
+            description: 'Номер телефону'
+          isFavourite:
+            type: boolean
+            example: false
+            description: 'Чи у фаворитах'
+          contactType:
+            type: string
+            example: 'personal'
+            description: 'Тип контакту (personal / work / ін.)'
+          photo:
+            type: string
+            format: binary
+            description: "Файл фото (поле photo відповідає upload.single('photo'))"
 responses:
   '201':
     $ref: ../../components/responses.yaml#/Created

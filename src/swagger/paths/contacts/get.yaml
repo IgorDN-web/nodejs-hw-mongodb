@@ -10,6 +10,12 @@ parameters:
   - $ref: ../../components/parameters/sortBy.yaml
   - $ref: ../../components/parameters/sortOrder.yaml
   - $ref: ../../components/parameters/favorite.yaml
+  - name: type
+    in: query
+    description: Фільтрація за типом контакту
+    required: false
+    schema:
+      type: string
 responses:
   '200':
     description: OK

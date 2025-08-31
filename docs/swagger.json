@@ -14,9 +14,7 @@
     { "url": "http://localhost:3000", "description": "Local server" },
     { "url": "https://nodejs-hw-mongodb-7-5jsk.onrender.com", "description": "Production server" }
   ],
-  "security": [
-    { "bearerAuth": [] }
-  ],
+  "security": [{ "bearerAuth": [] }],
   "tags": [
     { "name": "Contacts", "description": "Operations related to contacts" },
     { "name": "Auth", "description": "User authentication and registration" }
@@ -27,8 +25,21 @@
         "tags": ["Contacts"],
         "summary": "Get all contacts",
         "operationId": "getAllContacts",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "perPage", "in": "query", "schema": { "type": "integer", "default": 10 } },
+          { "name": "sortBy", "in": "query", "schema": { "type": "string", "default": "name" } },
+          { "name": "sortOrder", "in": "query", "schema": { "type": "string", "default": "asc" } },
+          { "name": "type", "in": "query", "schema": { "type": "string" } },
+          { "name": "favorite", "in": "query", "schema": { "type": "boolean" } }
+        ],
         "responses": {
-          "200": { "description": "List of contacts", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ContactsList" } } } },
+          "200": {
+            "description": "List of contacts",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ContactsList" } }
+            }
+          },
           "401": { "$ref": "#/components/responses/Unauthorized" }
         }
       },
@@ -45,7 +56,10 @@
           }
         },
         "responses": {
-          "201": { "description": "Successfully created contact", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Contact" } } } },
+          "201": {
+            "description": "Successfully created contact",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Contact" } } }
+          },
           "400": { "description": "Invalid input" },
           "401": { "$ref": "#/components/responses/Unauthorized" }
         }
@@ -75,9 +89,7 @@
         "requestBody": {
           "required": true,
           "content": {
-            "multipart/form-data": {
-              "schema": { "$ref": "#/components/schemas/ContactInput" }
-            }
+            "multipart/form-data": { "schema": { "$ref": "#/components/schemas/ContactInput" } }
           }
         },
         "responses": {
@@ -144,8 +156,9 @@
           "_id": { "type": "string", "example": "64d1f8a2c2f1b23a4f9c1234" },
           "name": { "type": "string", "example": "John Doe" },
           "email": { "type": "string", "format": "email", "example": "john@example.com" },
-          "phone": { "type": "string", "example": "+380501234567" },
-          "image": { "type": "string", "format": "binary" }
+          "phoneNumber": { "type": "string", "example": "+380501234567" },
+          "favorite": { "type": "boolean", "example": false },
+          "photo": { "type": "string", "format": "binary" }
         }
       },
       "ContactInput": {
@@ -153,14 +166,20 @@
         "properties": {
           "name": { "type": "string", "example": "John Doe" },
           "email": { "type": "string", "format": "email", "example": "john@example.com" },
-          "phone": { "type": "string", "example": "+380501234567" },
-          "image": { "type": "string", "format": "binary" }
+          "phoneNumber": { "type": "string", "example": "+380501234567" },
+          "favorite": { "type": "boolean", "example": false },
+          "photo": { "type": "string", "format": "binary" }
         },
         "required": ["name", "email"]
       },
       "ContactsList": {
-        "type": "array",
-        "items": { "$ref": "#/components/schemas/Contact" }
+        "type": "object",
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/Contact" } },
+          "page": { "type": "integer", "example": 1 },
+          "limit": { "type": "integer", "example": 10 },
+          "total": { "type": "integer", "example": 123 }
+        }
       },
       "UserInput": {
         "type": "object",
@@ -171,9 +190,7 @@
         "required": ["email", "password"]
       }
     },
-    "securitySchemes": {
-      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
-    },
+    "securitySchemes": { "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" } },
     "responses": {
       "Unauthorized": {
         "description": "Unauthorized – invalid or missing token",
@@ -181,10 +198,7 @@
           "application/json": {
             "schema": {
               "type": "object",
-              "properties": {
-                "status": { "type": "integer", "example": 401 },
-                "message": { "type": "string", "example": "Not authorized" }
-              }
+              "properties": { "status": { "type": "integer", "example": 401 }, "message": { "type": "string", "example": "Not authorized" } }
             }
           }
         }

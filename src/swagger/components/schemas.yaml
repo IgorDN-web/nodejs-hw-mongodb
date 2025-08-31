@@ -1,77 +1,75 @@
+# =======================
+# Contacts
+# =======================
 Contact:
   type: object
   properties:
     id:
       type: string
-      example: "66cf8a2f8b8b9e3c1b1f1234"
+      example: '66cf8a2f8b8b9e3c1b1f1234'
     name:
       type: string
-      example: "John Doe"
+      example: 'John Doe'
     email:
       type: string
       format: email
-      example: "john@example.com"
-    phone:
+      example: 'john@example.com'
+    phoneNumber:
       type: string
-      example: "+380631112233"
-    isFavorite:
+      example: '+380631112233'
+    favorite:
       type: boolean
       example: false
-    avatarUrl:
+    photo:
       type: string
-      example: "https://res.cloudinary.com/demo/image/upload/avatar.jpg"
+      example: 'https://res.cloudinary.com/demo/image/upload/avatar.jpg'
     createdAt:
       type: string
       format: date-time
+      example: '2025-08-31T10:00:00Z'
     updatedAt:
       type: string
       format: date-time
+      example: '2025-08-31T10:00:00Z'
 
 ContactCreate:
   type: object
-  required: [name, email, phone]
+  required: [name, email, phoneNumber]
   properties:
     name:
       type: string
+      example: 'John Doe'
     email:
       type: string
       format: email
-    phone:
+      example: 'john@example.com'
+    phoneNumber:
       type: string
-    isFavorite:
+      example: '+380631112233'
+    favorite:
       type: boolean
-    avatarUrl:
+      example: false
+    photo:
       type: string
+      example: 'https://res.cloudinary.com/demo/image/upload/avatar.jpg'
 
 ContactUpdate:
   type: object
   properties:
     name:
       type: string
+      example: 'John Updated'
     email:
       type: string
       format: email
-    phone:
+      example: 'updated@example.com'
+    phoneNumber:
       type: string
-    isFavorite:
+      example: '+380631112244'
+    favorite:
       type: boolean
-    avatarUrl:
+      example: true
+    photo:
       type: string
+      example: 'https://res.cloudinary.com/demo/image/upload/avatar_updated.jpg'
   minProperties: 1
-
-ContactsList:
-  type: object
-  properties:
-    items:
-      type: array
-      items:
-        $ref: '#/Contact'
-    page:
-      type: integer
-      example: 1
-    limit:
-      type: integer
-      example: 10
-    total:
-      type: integer
-      example: 123

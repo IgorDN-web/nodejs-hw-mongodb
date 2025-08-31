@@ -1,15 +1,43 @@
 tags: [Contacts]
 summary: Оновити контакт
 operationId: updateContact
-description: Часткове оновлення контакта
+description: Часткове оновлення контакту (можна оновити поля та/або замінити фото).
 security:
   - bearerAuth: []
+parameters:
+  - name: contactId
+    in: path
+    required: true
+    description: Ідентифікатор контакту
+    schema:
+      type: string
 requestBody:
   required: true
   content:
-    application/json:
+    multipart/form-data:
       schema:
-        $ref: ../../components/schemas.yaml#/ContactUpdate
+        type: object
+        properties:
+          name:
+            type: string
+            example: 'John Doe'
+          email:
+            type: string
+            format: email
+            example: 'john@example.com'
+          phoneNumber:
+            type: string
+            example: '+380501234567'
+          isFavourite:
+            type: boolean
+            example: true
+          contactType:
+            type: string
+            example: 'work'
+          photo:
+            type: string
+            format: binary
+            description: 'Нове фото (поле photo)'
 responses:
   '200':
     $ref: ../../components/responses.yaml#/Ok

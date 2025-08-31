@@ -1,12 +1,19 @@
 tags: [Contacts]
 summary: Видалити контакт
 operationId: deleteContact
-description: Видаляє контакт за ID
+description: Видаляє контакт за його унікальним ідентифікатором
 security:
   - bearerAuth: []
+parameters:
+  - name: contactId
+    in: path
+    required: true
+    description: Унікальний ідентифікатор контакту
+    schema:
+      type: string
 responses:
   '204':
-    $ref: ../../components/responses.yaml#/NoContent
+    description: Контакт успішно видалено (No Content)
   '401':
     $ref: ../../components/responses.yaml#/Unauthorized
   '404':

@@ -1,9 +1,16 @@
 tags: [Contacts]
 summary: Отримати контакт за ID
 operationId: getContactById
-description: Повертає контакт
+description: Повертає контакт за його унікальним ідентифікатором
 security:
   - bearerAuth: []
+parameters:
+  - name: contactId
+    in: path
+    required: true
+    description: Унікальний ідентифікатор контакту
+    schema:
+      type: string
 responses:
   '200':
     description: OK
