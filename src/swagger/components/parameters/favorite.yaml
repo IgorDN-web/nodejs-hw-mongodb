@@ -1,0 +1,5 @@
+name: isFavorite
+in: query
+description: Фільтр за улюбленими
+schema:
+  type: boolean

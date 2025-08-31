@@ -1,0 +1,8 @@
+name: limit
+in: query
+description: Кількість на сторінці
+schema:
+  type: integer
+  minimum: 1
+  maximum: 100
+  default: 10

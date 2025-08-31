@@ -1,0 +1,11 @@
+tags: [Auth]
+summary: Вихід із системи
+operationId: logout
+description: Інвалідовує сесію/refresh
+security:
+  - bearerAuth: []
+responses:
+  '204':
+    $ref: ../../components/responses.yaml#/NoContent
+  '401':
+    $ref: ../../components/responses.yaml#/Unauthorized

@@ -1,0 +1,77 @@
+Contact:
+  type: object
+  properties:
+    id:
+      type: string
+      example: "66cf8a2f8b8b9e3c1b1f1234"
+    name:
+      type: string
+      example: "John Doe"
+    email:
+      type: string
+      format: email
+      example: "john@example.com"
+    phone:
+      type: string
+      example: "+380631112233"
+    isFavorite:
+      type: boolean
+      example: false
+    avatarUrl:
+      type: string
+      example: "https://res.cloudinary.com/demo/image/upload/avatar.jpg"
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+
+ContactCreate:
+  type: object
+  required: [name, email, phone]
+  properties:
+    name:
+      type: string
+    email:
+      type: string
+      format: email
+    phone:
+      type: string
+    isFavorite:
+      type: boolean
+    avatarUrl:
+      type: string
+
+ContactUpdate:
+  type: object
+  properties:
+    name:
+      type: string
+    email:
+      type: string
+      format: email
+    phone:
+      type: string
+    isFavorite:
+      type: boolean
+    avatarUrl:
+      type: string
+  minProperties: 1
+
+ContactsList:
+  type: object
+  properties:
+    items:
+      type: array
+      items:
+        $ref: '#/Contact'
+    page:
+      type: integer
+      example: 1
+    limit:
+      type: integer
+      example: 10
+    total:
+      type: integer
+      example: 123

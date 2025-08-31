@@ -1,0 +1,19 @@
+tags: [Auth]
+summary: Реєстрація користувача
+operationId: register
+description: Створює користувача та сесію
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required: [email, password]
+        properties:
+          email: { type: string, format: email }
+          password: { type: string, minLength: 6 }
+responses:
+  '201':
+    $ref: ../../components/responses.yaml#/Created
+  '400':
+    $ref: ../../components/responses.yaml#/BadRequest

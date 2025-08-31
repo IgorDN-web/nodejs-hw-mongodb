@@ -1,0 +1,6 @@
+name: sortBy
+in: query
+description: Поле сортування
+schema:
+  type: string
+  enum: [name, email, phone, createdAt]

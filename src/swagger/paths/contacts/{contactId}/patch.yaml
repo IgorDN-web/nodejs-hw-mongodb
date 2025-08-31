@@ -1,0 +1,21 @@
+tags: [Contacts]
+summary: Оновити контакт
+operationId: updateContact
+description: Часткове оновлення контакта
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: ../../components/schemas.yaml#/ContactUpdate
+responses:
+  '200':
+    $ref: ../../components/responses.yaml#/Ok
+  '400':
+    $ref: ../../components/responses.yaml#/BadRequest
+  '401':
+    $ref: ../../components/responses.yaml#/Unauthorized
+  '404':
+    $ref: ../../components/responses.yaml#/NotFound

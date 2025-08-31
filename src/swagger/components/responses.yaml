@@ -1,0 +1,16 @@
+Ok:
+  description: OK
+Created:
+  description: Створено
+NoContent:
+  description: Видалено
+BadRequest:
+  description: Невірні дані запиту
+Unauthorized:
+  description: Неавторизовано
+Forbidden:
+  description: Заборонено
+NotFound:
+  description: Не знайдено
+ValidationError:
+  description: Помилка валідації

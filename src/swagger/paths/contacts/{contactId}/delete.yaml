@@ -1,0 +1,13 @@
+tags: [Contacts]
+summary: Видалити контакт
+operationId: deleteContact
+description: Видаляє контакт за ID
+security:
+  - bearerAuth: []
+responses:
+  '204':
+    $ref: ../../components/responses.yaml#/NoContent
+  '401':
+    $ref: ../../components/responses.yaml#/Unauthorized
+  '404':
+    $ref: ../../components/responses.yaml#/NotFound

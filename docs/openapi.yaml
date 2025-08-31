@@ -1,127 +1,54 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
-  title: Contacts API
-  description: API for managing contacts (CRUD, authentication, users).
   version: 1.0.0
-  contact:
-    name: Igor Developer
-    email: igor@example.com
-    url: https://github.com/IgorDN-web
-
-servers:
-  - url: http://localhost:3000/api
-    description: Local server
+  title: Contacts API (hw7-swagger)
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: |
+    REST API для роботи з контактами (CRUD) + авторизація. Документація зібрана ReDocly, інтерактив — на /api-docs.
 
 tags:
   - name: Contacts
-    description: Operations related to contacts
+    description: Операції з контактами
   - name: Auth
-    description: User authentication and registration
+    description: Авторизація та токени
+
+servers:
+  - url: http://localhost:3000
+    description: Local
+  - url: https://nodejs-hw-mongodb-7-5jsk.onrender.com
+    description: Render (hw7-swagger)
 
 paths:
   /contacts:
     get:
-      tags: [Contacts]
-      summary: Get all contacts
-      description: Returns a list of all contacts available for the authenticated user.
-      responses:
-        '200':
-          description: Successfully retrieved contacts
-          content:
-            application/json:
-              schema:
-                $ref: ./components/schemas.yaml#/schemas/ContactsList
-        '401':
-          $ref: ./components/responses.yaml#/responses/Unauthorized
-
+      $ref: ../swagger/paths/contacts/get.yaml
     post:
-      tags: [Contacts]
-      summary: Create a new contact
-      description: Creates and stores a new contact in the database.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: ./components/schemas.yaml#/schemas/Contact
-      responses:
-        '201':
-          description: Successfully created a contact
-          content:
-            application/json:
-              schema:
-                $ref: ./components/schemas.yaml#/schemas/Contact
-        '401':
-          $ref: ./components/responses.yaml#/responses/Unauthorized
+      $ref: ../swagger/paths/contacts/post.yaml
 
-  /contacts/{id}:
+  /contacts/{contactId}:
+    parameters:
+      - $ref: ../swagger/components/parameters/contactId.yaml
     get:
-      tags: [Contacts]
-      summary: Get contact by ID
-      description: Returns a single contact by its unique identifier.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successfully found contact
-          content:
-            application/json:
-              schema:
-                $ref: ./components/schemas.yaml#/schemas/Contact
-        '401':
-          $ref: ./components/responses.yaml#/responses/Unauthorized
-        '404':
-          description: Contact not found
-
+      $ref: ../swagger/paths/contacts/{contactId}/get.yaml
     patch:
-      tags: [Contacts]
-      summary: Update a contact
-      description: Updates fields of an existing contact.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: ./components/schemas.yaml#/schemas/Contact
-      responses:
-        '200':
-          description: Successfully updated contact
-          content:
-            application/json:
-              schema:
-                $ref: ./components/schemas.yaml#/schemas/Contact
-        '401':
-          $ref: ./components/responses.yaml#/responses/Unauthorized
-        '404':
-          description: Contact not found
-
+      $ref: ../swagger/paths/contacts/{contactId}/patch.yaml
     delete:
-      tags: [Contacts]
-      summary: Delete a contact
-      description: Deletes a contact from the database by its ID.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successfully deleted contact
-        '401':
-          $ref: ./components/responses.yaml#/responses/Unauthorized
-        '404':
-          description: Contact not found
+      $ref: ../swagger/paths/contacts/{contactId}/delete.yaml
+
+  /auth/register:
+    post:
+      $ref: ../swagger/paths/auth/register.post.yaml
+  /auth/login:
+    post:
+      $ref: ../swagger/paths/auth/login.post.yaml
+  /auth/refresh:
+    post:
+      $ref: ../swagger/paths/auth/refresh.post.yaml
+  /auth/logout:
+    post:
+      $ref: ../swagger/paths/auth/logout.post.yaml
 
 components:
   securitySchemes:
@@ -129,5 +56,23 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-security:
-  - bearerAuth: []
+
+  schemas:
+    $ref: ../swagger/components/schemas.yaml
+
+  responses:
+    $ref: ../swagger/components/responses.yaml
+
+  parameters:
+    contactId:
+      $ref: ../swagger/components/parameters/contactId.yaml
+    paginationPage:
+      $ref: ../swagger/components/parameters/paginationPage.yaml
+    paginationLimit:
+      $ref: ../swagger/components/parameters/paginationLimit.yaml
+    sortBy:
+      $ref: ../swagger/components/parameters/sortBy.yaml
+    sortOrder:
+      $ref: ../swagger/components/parameters/sortOrder.yaml
+    favorite:
+      $ref: ../swagger/components/parameters/favorite.yaml

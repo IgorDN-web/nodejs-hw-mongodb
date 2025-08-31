@@ -1,0 +1,21 @@
+tags: [Contacts]
+summary: Отримати список контактів
+operationId: getContacts
+description: Повертає список контактів з пагінацією, сортуванням та фільтрами.
+security:
+  - bearerAuth: []
+parameters:
+  - $ref: ../../components/parameters/paginationPage.yaml
+  - $ref: ../../components/parameters/paginationLimit.yaml
+  - $ref: ../../components/parameters/sortBy.yaml
+  - $ref: ../../components/parameters/sortOrder.yaml
+  - $ref: ../../components/parameters/favorite.yaml
+responses:
+  '200':
+    description: OK
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas.yaml#/ContactsList
+  '401':
+    $ref: ../../components/responses.yaml#/Unauthorized

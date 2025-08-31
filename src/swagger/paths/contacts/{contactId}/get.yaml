@@ -1,0 +1,17 @@
+tags: [Contacts]
+summary: Отримати контакт за ID
+operationId: getContactById
+description: Повертає контакт
+security:
+  - bearerAuth: []
+responses:
+  '200':
+    description: OK
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas.yaml#/Contact
+  '401':
+    $ref: ../../components/responses.yaml#/Unauthorized
+  '404':
+    $ref: ../../components/responses.yaml#/NotFound

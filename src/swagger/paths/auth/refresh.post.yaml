@@ -1,0 +1,24 @@
+tags: [Auth]
+summary: Оновити access токен
+operationId: refresh
+description: Приймає refresh токен, повертає новий access
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required: [refreshToken]
+        properties:
+          refreshToken: { type: string }
+responses:
+  '200':
+    description: OK
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            accessToken: { type: string }
+  '401':
+    $ref: ../../components/responses.yaml#/Unauthorized

@@ -1,9 +1,18 @@
+# See https://redocly.com/docs/cli/configuration/
 apis:
-  contacts@v1:
+  sample@v1:
     root: docs/openapi.yaml
 extends:
   - recommended
 rules:
   no-unused-components: error
-# theme больше не указываем здесь
-# htmlTemplate нужно подключать через index.html, как вы уже сделали
+theme:
+  htmlTemplate: ./docs/index.html
+  colors:
+    primary:
+      main: '#32329f'
+  generateCodeSamples:
+    languages:
+      - lang: curl
+      - lang: Node.js
+      - lang: JavaScript
