@@ -1,227 +1,280 @@
-{
-  "openapi": "3.0.0",
-  "info": {
-    "title": "Contacts API",
-    "version": "1.0.0",
-    "description": "API for managing contacts (CRUD, authentication, users).",
-    "contact": {
-      "name": "Igor Developer",
-      "url": "https://example.com",
-      "email": "igor@example.com"
-    }
-  },
-  "servers": [
-    {
-      "url": "http://localhost:3000",
-      "description": "Local server"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
-    }
-  ],
-  "paths": {
-    "/contacts": {
-      "get": {
-        "summary": "Get all contacts",
-        "operationId": "getContacts",
-        "responses": {
-          "200": {
-            "description": "List of contacts",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContactsList"
-                }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" }
-        }
-      },
-      "post": {
-        "summary": "Create a new contact",
-        "operationId": "createContact",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/ContactInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Contact created",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Contact" }
-              }
-            }
-          },
-          "400": { "description": "Invalid input" },
-          "401": { "description": "Unauthorized" }
-        }
-      }
-    },
-    "/contacts/{contactId}": {
-      "get": {
-        "summary": "Get contact by ID",
-        "operationId": "getContactById",
-        "parameters": [
-          {
-            "name": "contactId",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Contact found",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Contact" }
-              }
-            }
-          },
-          "404": { "description": "Contact not found" },
-          "401": { "description": "Unauthorized" }
-        }
-      },
-      "patch": {
-        "summary": "Update a contact",
-        "operationId": "updateContact",
-        "parameters": [
-          {
-            "name": "contactId",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/ContactInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Contact updated",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Contact" }
-              }
-            }
-          },
-          "400": { "description": "Invalid input" },
-          "404": { "description": "Contact not found" },
-          "401": { "description": "Unauthorized" }
-        }
-      },
-      "delete": {
-        "summary": "Delete a contact",
-        "operationId": "deleteContact",
-        "parameters": [
-          {
-            "name": "contactId",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
-        ],
-        "responses": {
-          "204": { "description": "Contact deleted successfully" },
-          "404": { "description": "Contact not found" },
-          "401": { "description": "Unauthorized" }
-        }
-      }
-    },
-    "/auth/register": {
-      "post": {
-        "summary": "Register new user",
-        "operationId": "registerUser",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UserInput" }
-            }
-          }
-        },
-        "responses": {
-          "201": { "description": "User registered successfully" },
-          "400": { "description": "Invalid input" }
-        }
-      }
-    },
-    "/auth/login": {
-      "post": {
-        "summary": "User login",
-        "operationId": "loginUser",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UserInput" }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Login successful" },
-          "401": { "description": "Invalid credentials" }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Contact": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "email": { "type": "string" },
-          "phone": { "type": "string" },
-          "image": { "type": "string", "format": "binary" }
-        }
-      },
-      "ContactInput": {
-        "type": "object",
-        "properties": {
-          "name": { "type": "string" },
-          "email": { "type": "string" },
-          "phone": { "type": "string" },
-          "image": { "type": "string", "format": "binary" }
-        }
-      },
-      "ContactsList": {
-        "type": "array",
-        "items": { "$ref": "#/components/schemas/Contact" }
-      },
-      "UserInput": {
-        "type": "object",
-        "properties": {
-          "email": { "type": "string" },
-          "password": { "type": "string" }
-        },
-        "required": ["email", "password"]
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    }
-  }
-}
+openapi: 3.0.0
+info:
+  title: Contacts API
+  version: 1.0.0
+  description: API for managing contacts (CRUD, authentication, users).
+  contact:
+    name: Igor Developer
+    url: https://example.com
+    email: igor@example.com
+servers:
+  - url: http://localhost:3000
+    description: Local server
+  - url: https://nodejs-hw-mongodb-7-5jsk.onrender.com
+    description: Production server
+security:
+  - bearerAuth: []
+paths:
+  /contacts:
+    get:
+      summary: Get all contacts
+      operationId: getAllContacts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: perPage
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            default: name
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            default: asc
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: isFavorite
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactsList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create a new contact
+      operationId: createContact
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContactInput'
+      responses:
+        '201':
+          description: Contact created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '400':
+          description: Invalid input
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /contacts/{contactId}:
+    get:
+      summary: Get contact by ID
+      operationId: getContactById
+      parameters:
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Contact found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Contact not found
+    patch:
+      summary: Update a contact
+      operationId: updateContact
+      parameters:
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContactInput'
+      responses:
+        '200':
+          description: Contact updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '400':
+          description: Invalid input
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Contact not found
+    delete:
+      summary: Delete a contact
+      operationId: deleteContact
+      parameters:
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Contact deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Contact not found
+
+  /auth/register:
+    post:
+      summary: Register new user
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: User registered successfully
+        '400':
+          description: Invalid input
+
+  /auth/login:
+    post:
+      summary: User login
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '200':
+          description: Login successful
+        '401':
+          description: Invalid credentials
+
+components:
+  schemas:
+    Contact:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: '64d1f8a2c2f1b23a4f9c1234'
+        name:
+          type: string
+          example: 'John Doe'
+        email:
+          type: string
+          format: email
+          example: 'john@example.com'
+        phoneNumber:
+          type: string
+          example: '+380501234567'
+        isFavorite:
+          type: boolean
+          example: false
+        contactType:
+          type: string
+          enum: [personal, work, other]
+          example: personal
+        photo:
+          type: string
+          format: binary
+    ContactInput:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'John Doe'
+        email:
+          type: string
+          format: email
+          example: 'john@example.com'
+        phoneNumber:
+          type: string
+          example: '+380501234567'
+        isFavorite:
+          type: boolean
+          example: false
+        contactType:
+          type: string
+          enum: [personal, work, other]
+          example: work
+        photo:
+          type: string
+          format: binary
+      required:
+        - name
+        - email
+    ContactsList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        total:
+          type: integer
+          example: 123
+    UserInput:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: 'user@example.com'
+        password:
+          type: string
+          example: 'password123'
+      required:
+        - email
+        - password
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    Unauthorized:
+      description: Unauthorized – invalid or missing token
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 401
+              message:
+                type: string
+                example: 'Not authorized'

@@ -31,15 +31,10 @@
           { "name": "sortBy", "in": "query", "schema": { "type": "string", "default": "name" } },
           { "name": "sortOrder", "in": "query", "schema": { "type": "string", "default": "asc" } },
           { "name": "type", "in": "query", "schema": { "type": "string" } },
-          { "name": "favorite", "in": "query", "schema": { "type": "boolean" } }
+          { "name": "isFavorite", "in": "query", "schema": { "type": "boolean" } }
         ],
         "responses": {
-          "200": {
-            "description": "List of contacts",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ContactsList" } }
-            }
-          },
+          "200": { "description": "List of contacts", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ContactsList" } } } },
           "401": { "$ref": "#/components/responses/Unauthorized" }
         }
       },
@@ -49,17 +44,10 @@
         "operationId": "createContact",
         "requestBody": {
           "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": { "$ref": "#/components/schemas/ContactInput" }
-            }
-          }
+          "content": { "multipart/form-data": { "schema": { "$ref": "#/components/schemas/ContactInput" } } }
         },
         "responses": {
-          "201": {
-            "description": "Successfully created contact",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Contact" } } }
-          },
+          "201": { "description": "Successfully created contact", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Contact" } } } },
           "400": { "description": "Invalid input" },
           "401": { "$ref": "#/components/responses/Unauthorized" }
         }
@@ -70,9 +58,7 @@
         "tags": ["Contacts"],
         "summary": "Get contact by ID",
         "operationId": "getContactById",
-        "parameters": [
-          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
+        "parameters": [{ "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }],
         "responses": {
           "200": { "description": "Contact found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Contact" } } } },
           "401": { "$ref": "#/components/responses/Unauthorized" },
@@ -83,14 +69,10 @@
         "tags": ["Contacts"],
         "summary": "Update a contact",
         "operationId": "updateContact",
-        "parameters": [
-          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
+        "parameters": [{ "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }],
         "requestBody": {
           "required": true,
-          "content": {
-            "multipart/form-data": { "schema": { "$ref": "#/components/schemas/ContactInput" } }
-          }
+          "content": { "multipart/form-data": { "schema": { "$ref": "#/components/schemas/ContactInput" } } }
         },
         "responses": {
           "200": { "description": "Successfully updated contact", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Contact" } } } },
@@ -103,9 +85,7 @@
         "tags": ["Contacts"],
         "summary": "Delete a contact",
         "operationId": "deleteContact",
-        "parameters": [
-          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
+        "parameters": [{ "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }],
         "responses": {
           "204": { "description": "Successfully deleted contact" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
@@ -118,12 +98,7 @@
         "tags": ["Auth"],
         "summary": "Register new user",
         "operationId": "registerUser",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/UserInput" } }
-          }
-        },
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserInput" } } } },
         "responses": {
           "201": { "description": "User registered successfully" },
           "400": { "description": "Invalid input" }
@@ -135,12 +110,7 @@
         "tags": ["Auth"],
         "summary": "User login",
         "operationId": "loginUser",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/UserInput" } }
-          }
-        },
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserInput" } } } },
         "responses": {
           "200": { "description": "Login successful, returns token" },
           "401": { "description": "Invalid credentials" }
@@ -157,7 +127,8 @@
           "name": { "type": "string", "example": "John Doe" },
           "email": { "type": "string", "format": "email", "example": "john@example.com" },
           "phoneNumber": { "type": "string", "example": "+380501234567" },
-          "favorite": { "type": "boolean", "example": false },
+          "isFavorite": { "type": "boolean", "example": false },
+          "contactType": { "type": "string", "enum": ["personal","work","other"], "example": "personal" },
           "photo": { "type": "string", "format": "binary" }
         }
       },
@@ -167,10 +138,11 @@
           "name": { "type": "string", "example": "John Doe" },
           "email": { "type": "string", "format": "email", "example": "john@example.com" },
           "phoneNumber": { "type": "string", "example": "+380501234567" },
-          "favorite": { "type": "boolean", "example": false },
+          "isFavorite": { "type": "boolean", "example": false },
+          "contactType": { "type": "string", "enum": ["personal","work","other"], "example": "work" },
           "photo": { "type": "string", "format": "binary" }
         },
-        "required": ["name", "email"]
+        "required": ["name","email"]
       },
       "ContactsList": {
         "type": "object",
@@ -187,21 +159,14 @@
           "email": { "type": "string", "format": "email", "example": "user@example.com" },
           "password": { "type": "string", "example": "password123" }
         },
-        "required": ["email", "password"]
+        "required": ["email","password"]
       }
     },
     "securitySchemes": { "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" } },
     "responses": {
       "Unauthorized": {
         "description": "Unauthorized – invalid or missing token",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": { "status": { "type": "integer", "example": 401 }, "message": { "type": "string", "example": "Not authorized" } }
-            }
-          }
-        }
+        "content": { "application/json": { "schema": { "type": "object", "properties": { "status": { "type": "integer", "example": 401 }, "message": { "type": "string", "example": "Not authorized" } } } } }
       }
     }
   }

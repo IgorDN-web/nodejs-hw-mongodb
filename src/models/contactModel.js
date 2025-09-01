@@ -21,7 +21,7 @@ const contactSchema = new mongoose.Schema(
       type: String,
       required: [true, "Phone number is required"],
     },
-    favorite: {
+    isFavorite: {
       type: Boolean,
       default: false,
     },
@@ -31,6 +31,7 @@ const contactSchema = new mongoose.Schema(
     contactType: {
       type: String,
       enum: ["personal", "work", "other"],
+      required: [true, "Contact type is required"],
       default: "personal",
     },
   },
